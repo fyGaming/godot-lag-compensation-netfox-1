@@ -122,11 +122,26 @@ func _add_player_to_game(id: int):
 	
 	_players_spawn_node.add_child(player_to_add, true)
 	
+	# 通知游戏管理器更新UI
+	if scene_name == "GameMPSurvivor":
+		var game_manager = get_tree().get_current_scene().get_node_or_null("%GameManager")
+		if game_manager:
+			game_manager._update_player_info_ui()
+			game_manager._update_start_game_button()
+
 func _del_player(id: int):
 	print("Player %s left the game!" % id)
 	if not _players_spawn_node.has_node(str(id)):
 		return
 	_players_spawn_node.get_node(str(id)).queue_free()
+	
+	# 通知游戏管理器更新UI
+	var current_scene = get_tree().get_current_scene()
+	if current_scene.name == "GameMPSurvivor":
+		var game_manager = current_scene.get_node_or_null("%GameManager")
+		if game_manager:
+			game_manager._update_player_info_ui()
+			game_manager._update_start_game_button()
 
 
 

@@ -1,82 +1,111 @@
 extends Node
 
-@onready var start_game_button = $StartGameButton
-@onready var countdown_label = $CountdownLabel
-@onready var countdown_timer = $CountdownTimer
+#@onready var start_game_button = $"../StartGameButton"
+@onready var start_game_button: Button = %StartGameButton
+
+#@onready var countdown_label = $"../CountdownLabel"sa
+#@onready var countdown_timer = $"../CountdownTimer"
+@onready var countdown_label: Label = %CountdownLabel
+@onready var countdown_timer: Timer = %CountdownTimer
+
+# 玩家信息UI相关
+@onready var player_info_container = $"../PlayerInfoUI/PanelContainer/VBoxContainer/PlayerList"
+# 我们在运行时加载玩家信息项场景，而不是预加载
+var player_info_item_scene = null
+var killer_icon = preload("res://icon.svg") # 替换为真实的杀手图标路径
+var survivor_icon = preload("res://icon.svg") # 替换为真实的幸存者图标路径
 
 var killer_scene = load("res://scenes/mpsurvivor/killer.tscn")
 var survivor_scene = load("res://scenes/mpsurvivor/survivor.tscn")
 var game_started = false
 var players_info = {}
 
+# 使用静态函数获取全局模块
+func get_global():
+	return get_node("/root/Global")
+
 func _ready():
-	if OS.has_feature("dedicated_server"):
-		print("启动专用服务器...")
-		%NetworkManager.become_host(true)
+	# 加载玩家信息项场景
+	player_info_item_scene = load("res://scenes/player_info_item.tscn")
+	if player_info_item_scene == null:
+		push_error("无法加载玩家信息项场景")
 	
-	# 连接网络管理器的信号
+	# 初始化全局模块引用
+	if not "Global" in get_tree().root.get_children():
+		var global_scene = load("res://scripts/multiplayer/global.tscn").instantiate()
+		global_scene.name = "Global"
+		get_tree().root.add_child(global_scene)
+		
+	# 显示玩家信息UI
+	$"../PlayerInfoUI".visible = true
+	
+	# 更新UI
+	_update_player_info_ui()
+	_update_start_game_button()
+	
+	# 监听网络事件
 	multiplayer.peer_connected.connect(_on_player_connected)
 	multiplayer.peer_disconnected.connect(_on_player_disconnected)
 
 func _on_player_connected(peer_id):
 	print("玩家 %d 已连接" % peer_id)
 	
-	if multiplayer.is_server():
-		players_info[peer_id] = { "role": "survivor", "health": 50 }
-		
-		# 如果房间内玩家数量>=2，显示开始游戏按钮
-		_update_start_game_button()
-	
-	# 更新玩家信息UI
+	# 网络模块会负责生成玩家，这里只负责更新UI
 	_update_player_info_ui()
+	_update_start_game_button()
 
 func _on_player_disconnected(peer_id):
 	print("玩家 %d 已断开连接" % peer_id)
 	
-	if multiplayer.is_server():
-		players_info.erase(peer_id)
-		
-		# 更新开始游戏按钮状态
-		_update_start_game_button()
-	
-	# 更新玩家信息UI
+	# 网络模块会负责移除玩家，这里只负责更新UI
 	_update_player_info_ui()
+	_update_start_game_button()
 
 func _update_player_info_ui():
-	# 显示玩家信息UI
-	$"../PlayerInfoUI".visible = true
-	
-	# 更新玩家列表
-	var player_list = $"../PlayerInfoUI/PanelContainer/VBoxContainer/PlayerList"
-	for child in player_list.get_children():
+	# 清空玩家信息面板
+	for child in player_info_container.get_children():
 		child.queue_free()
 	
-	# 从玩家节点收集信息
-	var player_ids = []
-	var players_node = $"../Players"
+	# 获取网络模块的玩家生成节点
+	var network = get_global().get_network()
+	if not network:
+		print("无法获取网络模块")
+		return
 	
-	# 获取所有已连接的玩家ID
-	for player in players_node.get_children():
-		player_ids.append(player.player_id)
+	var players_node = network._players_spawn_node
+	if not players_node:
+		print("无法获取玩家节点")
+		return
 	
-	player_ids.sort()
+	# 遍历所有玩家节点，为每个玩家创建信息面板
+	var player_count = 0
+	for player_node in players_node.get_children():
+		var player_id = player_node.player_id
+		player_count += 1
+		
+		# 创建玩家信息面板
+		var player_info_item = player_info_item_scene.instantiate()
+		player_info_container.add_child(player_info_item)
+		
+		# 设置玩家信息
+		var player_name = "玩家 " + str(player_id)
+		if player_id == multiplayer.get_unique_id():
+			player_name += " (你)"
+		elif player_id == 1:
+			player_name += " (主机)"
+		
+		player_info_item.get_node("PlayerName").text = player_name
+		
+		# 根据角色类型设置图标
+		var icon_texture
+		if player_node.is_in_group("Killer"):
+			icon_texture = killer_icon
+		else:
+			icon_texture = survivor_icon
+		
+		player_info_item.get_node("PlayerIcon").texture = icon_texture
 	
-	for id in player_ids:
-		var label = Label.new()
-		var role_text = ""
-		var player_node = players_node.get_node_or_null(str(id))
-		
-		if id == multiplayer.get_unique_id():
-			role_text = "（你）"
-		
-		if player_node:
-			if player_node.is_in_group("killer"):
-				role_text += " [Killer]"
-			elif player_node.is_in_group("survivor"):
-				role_text += " [Survivor]"
-		
-		label.text = "玩家 %d %s" % [id, role_text]
-		player_list.add_child(label)
+	print("已更新玩家UI，当前玩家数: ", player_count)
 
 func become_host():
 	print("成为主机")
@@ -204,9 +233,24 @@ func _survivor_died(survivor_id):
 
 # 根据房间内玩家数量更新开始游戏按钮
 func _update_start_game_button():
-	if multiplayer.is_server() and !game_started:
-		# 检查玩家数量 >=2 时可以开始游戏
-		var player_count = $"../Players".get_child_count()
-		start_game_button.visible = (player_count >= 2)
-	else:
+	# 仅对服务器显示开始游戏按钮
+	if not multiplayer.is_server():
 		start_game_button.visible = false
+		return
+	
+	# 对于服务器，总是显示开始按钮，但根据人数决定是否启用
+	start_game_button.visible = true
+	
+	# 获取玩家数量
+	var network = get_global().get_network()
+	if not network:
+		print("无法获取网络模块")
+		return
+		
+	var players_node = network._players_spawn_node
+	var player_count = players_node.get_child_count()
+	
+	# 只有当至少有两个玩家连接时才启用开始按钮
+	start_game_button.disabled = player_count < 2
+	
+	print("更新开始游戏按钮，当前玩家数: ", player_count, ", 按钮状态: ", "启用" if not start_game_button.disabled else "禁用")

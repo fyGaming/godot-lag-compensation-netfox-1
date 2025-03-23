@@ -56,11 +56,43 @@ func _add_player_to_game(id: int):
 	
 	_players_spawn_node.add_child(player_to_add, true)
 	
+	# 通知游戏管理器更新UI
+	if scene_name == "GameMPSurvivor":
+		var game_manager = get_tree().get_current_scene().get_node_or_null("%GameManager")
+		if game_manager:
+			game_manager._update_player_info_ui()
+			game_manager._update_start_game_button()
+			
+			# 服务器通知所有客户端更新UI
+			if multiplayer.is_server():
+				_sync_all_clients_ui.rpc()
+
+@rpc("authority", "call_remote")
+func _sync_all_clients_ui():
+	# 强制所有客户端更新玩家信息UI
+	var game_manager = get_tree().get_current_scene().get_node_or_null("%GameManager")
+	if game_manager and get_tree().get_current_scene().name == "GameMPSurvivor":
+		game_manager._update_player_info_ui()
+
 func _del_player(id: int):
 	print("Player %s left the game!" % id)
-	if not _players_spawn_node.has_node(str(id)):
-		return
-	_players_spawn_node.get_node(str(id)).queue_free()
+	
+	# 从游戏中移除玩家
+	var player_node = _players_spawn_node.get_node_or_null(str(id))
+	if player_node:
+		player_node.queue_free()
+	
+	var scene_name = get_tree().get_current_scene().name
+	# 通知游戏管理器更新UI
+	if scene_name == "GameMPSurvivor":
+		var game_manager = get_tree().get_current_scene().get_node_or_null("%GameManager")
+		if game_manager:
+			game_manager._update_player_info_ui()
+			game_manager._update_start_game_button()
+			
+			# 服务器通知所有客户端更新UI
+			if multiplayer.is_server():
+				_sync_all_clients_ui.rpc()
 
 	
 	

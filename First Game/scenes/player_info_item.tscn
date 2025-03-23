@@ -1,0 +1,17 @@
+[gd_scene load_steps=0 format=3 uid="uid://cp4rgw0p5hclc"]
+
+[node name="PlayerInfoItem" type="HBoxContainer"]
+offset_right = 200.0
+offset_bottom = 40.0
+size_flags_horizontal = 3
+
+[node name="PlayerIcon" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PlayerName" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "玩家名称" 

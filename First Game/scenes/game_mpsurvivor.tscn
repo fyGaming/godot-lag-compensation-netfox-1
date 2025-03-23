@@ -35,15 +35,17 @@ theme_override_font_sizes/font_size = 12
 text = "多人吸血鬼生存模式"
 
 [node name="StartGameButton" type="Button" parent="GameManager"]
-visible = false
-offset_left = 450.0
-offset_top = 10.0
-offset_right = 550.0
-offset_bottom = 40.0
+unique_name_in_owner = true
+offset_left = 10.0
+offset_top = 35.0
+offset_right = 110.0
+offset_bottom = 65.0
 theme_override_fonts/font = ExtResource("2_tpkib")
+disabled = true
 text = "开始游戏"
 
 [node name="CountdownLabel" type="Label" parent="GameManager"]
+unique_name_in_owner = true
 visible = false
 offset_left = 450.0
 offset_top = 50.0
@@ -55,6 +57,7 @@ text = "5"
 horizontal_alignment = 1
 
 [node name="CountdownTimer" type="Timer" parent="GameManager"]
+unique_name_in_owner = true
 wait_time = 5.0
 one_shot = true
 
