@@ -1,17 +1,17 @@
 [gd_scene load_steps=20 format=3 uid="uid://cuv4vme4rwno0"]
 
-[ext_resource type="Script" path="res://scripts/game_manager.gd" id="1_l4ihi"]
+[ext_resource type="Script" uid="uid://db8u7m7ek051v" path="res://scripts/game_manager.gd" id="1_l4ihi"]
 [ext_resource type="PackedScene" uid="uid://dqnaqj8yb6hwd" path="res://scenes/player.tscn" id="1_rbmkf"]
 [ext_resource type="FontFile" uid="uid://c53kogtyjwsss" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="2_nlliu"]
 [ext_resource type="Texture2D" uid="uid://d0q2g65ahgok" path="res://assets/sprites/world_tileset.png" id="2_r1crl"]
 [ext_resource type="PackedScene" uid="uid://bgv5v2fxqlswe" path="res://scenes/platform.tscn" id="3_cmfc3"]
-[ext_resource type="Script" path="res://scripts/multiplayer/networks/network_manager.gd" id="3_sp8dn"]
+[ext_resource type="Script" uid="uid://dkkhgcnj7g2a5" path="res://scripts/multiplayer/networks/network_manager.gd" id="3_sp8dn"]
 [ext_resource type="PackedScene" uid="uid://pqp5qaw561fr" path="res://scenes/coin.tscn" id="4_28cek"]
 [ext_resource type="PackedScene" uid="uid://dtrbka1ef726o" path="res://scenes/killzone.tscn" id="5_x8euu"]
 [ext_resource type="PackedScene" uid="uid://d2w2i5h0lhc6l" path="res://scenes/slime.tscn" id="6_l0s6b"]
 [ext_resource type="FontFile" uid="uid://dbjl1e6kdxpl6" path="res://assets/fonts/PixelOperator8.ttf" id="7_8cblx"]
-[ext_resource type="Script" path="res://scripts/finish_line.gd" id="10_nyxvp"]
-[ext_resource type="PackedScene" path="res://scenes/player_info_ui.tscn" id="12_g7c24"]
+[ext_resource type="Script" uid="uid://lv8g0dg3j54i" path="res://scripts/finish_line.gd" id="10_nyxvp"]
+[ext_resource type="PackedScene" uid="uid://cv6uww8k8yhc8" path="res://scenes/player_info_ui.tscn" id="12_g7c24"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ashvg"]
 texture = ExtResource("2_r1crl")
@@ -215,8 +215,8 @@ tracks/0/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_xuk5v"]
 _data = {
-"RESET": SubResource("Animation_apgth"),
-"move": SubResource("Animation_bm7kf")
+&"RESET": SubResource("Animation_apgth"),
+&"move": SubResource("Animation_bm7kf")
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2186x"]
@@ -309,7 +309,7 @@ animation_player_optional = NodePath("AnimationPlayer")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Platforms/Platform2"]
 libraries = {
-"": SubResource("AnimationLibrary_xuk5v")
+&"": SubResource("AnimationLibrary_xuk5v")
 }
 autoplay = "move"
 
@@ -452,7 +452,7 @@ grow_vertical = 2
 layout_mode = 2
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://scenes/multiplayer_player.tscn")
+_spawnable_scenes = PackedStringArray("uid://d226nufmlvivj")
 spawn_path = NodePath("../Players")
 spawn_limit = 10
 

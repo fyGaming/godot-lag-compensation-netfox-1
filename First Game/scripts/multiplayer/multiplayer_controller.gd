@@ -104,19 +104,3 @@ func _respawn():
 	_respawning = true
 	
 	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

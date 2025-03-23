@@ -1,10 +1,10 @@
 [gd_scene load_steps=30 format=3 uid="uid://d226nufmlvivj"]
 
-[ext_resource type="Script" path="res://scripts/multiplayer/multiplayer_controller.gd" id="1_ij7lf"]
+[ext_resource type="Script" uid="uid://c5hs8x3i1l4hh" path="res://scripts/multiplayer/multiplayer_controller.gd" id="1_ij7lf"]
 [ext_resource type="Texture2D" uid="uid://b8cmjj8vq3r8d" path="res://assets/sprites/knight.png" id="2_5qtv2"]
-[ext_resource type="Script" path="res://scripts/multiplayer/multiplayer_input.gd" id="2_75sn2"]
-[ext_resource type="Script" path="res://addons/netfox/rollback/rollback-synchronizer.gd" id="3_qb0r7"]
-[ext_resource type="Script" path="res://addons/netfox/tick-interpolator.gd" id="4_3ymtc"]
+[ext_resource type="Script" uid="uid://x6cbjih2l86y" path="res://scripts/multiplayer/multiplayer_input.gd" id="2_75sn2"]
+[ext_resource type="Script" uid="uid://bw2uhfqy1ni2h" path="res://addons/netfox/rollback/rollback-synchronizer.gd" id="3_qb0r7"]
+[ext_resource type="Script" uid="uid://78qqn15e6kpw" path="res://addons/netfox/tick-interpolator.gd" id="4_3ymtc"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_bcfu3"]
 properties/0/path = NodePath(".:player_id")
