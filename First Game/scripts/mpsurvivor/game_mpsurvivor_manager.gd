@@ -24,9 +24,8 @@ func _on_player_connected(peer_id):
 	if multiplayer.is_server():
 		players_info[peer_id] = { "role": "survivor", "health": 50 }
 		
-		# 如果这是第一个连接的客户端，显示开始游戏按钮
-		if players_info.size() == 1:
-			start_game_button.visible = true
+		# 如果房间内玩家数量>=2，显示开始游戏按钮
+		_update_start_game_button()
 	
 	# 更新玩家信息UI
 	_update_player_info_ui()
@@ -37,9 +36,8 @@ func _on_player_disconnected(peer_id):
 	if multiplayer.is_server():
 		players_info.erase(peer_id)
 		
-		# 如果没有客户端连接，隐藏开始游戏按钮
-		if players_info.size() == 0:
-			start_game_button.visible = false
+		# 更新开始游戏按钮状态
+		_update_start_game_button()
 	
 	# 更新玩家信息UI
 	_update_player_info_ui()
@@ -216,3 +214,12 @@ func _update_survivor_health(survivor_id, new_health):
 func _survivor_died(survivor_id):
 	print("幸存者 %d 死亡!" % survivor_id)
 	# 可以在这里添加幸存者死亡的相关逻辑 
+
+# 根据房间内玩家数量更新开始游戏按钮
+func _update_start_game_button():
+	if multiplayer.is_server() and !game_started:
+		# 算上主机自己，玩家总数>=2时可以开始游戏
+		var total_players = players_info.size() + 1
+		start_game_button.visible = (total_players >= 2)
+	else:
+		start_game_button.visible = false

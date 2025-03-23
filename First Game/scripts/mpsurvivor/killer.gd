@@ -32,20 +32,9 @@ func _rollback_tick(delta, tick, is_fresh):
 func _apply_movement_from_input(delta):
 	# 获取输入方向
 	var direction = Vector2.ZERO
-	if input.input_direction < 0:
-		direction.x = -1
-	elif input.input_direction > 0:
-		direction.x = 1
 	
-	# Y轴方向通过Input系统直接获取（这里假设multiplayer_input.gd已被扩展以支持上下移动）
-	if Input.is_action_pressed("ui_up"):
-		direction.y = -1
-	elif Input.is_action_pressed("ui_down"):
-		direction.y = 1
-	
-	# 归一化向量以确保对角线移动不会更快
-	if direction.length() > 0:
-		direction = direction.normalized()
+	# 从输入系统获取方向（现在是Vector2）
+	direction = input.input_direction
 	
 	# 应用移动
 	velocity = direction * SPEED * NetworkTime.physics_factor
