@@ -1,4 +1,4 @@
-[gd_scene load_steps=0 format=3 uid="uid://cp4rgw0p5hclc"]
+[gd_scene format=3 uid="uid://udcg4gsv4wte"]
 
 [node name="PlayerInfoItem" type="HBoxContainer"]
 offset_right = 200.0
@@ -14,4 +14,4 @@ stretch_mode = 5
 [node name="PlayerName" type="Label" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "玩家名称" 
+text = "玩家名称"

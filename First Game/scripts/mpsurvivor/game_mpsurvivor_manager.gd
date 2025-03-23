@@ -98,7 +98,7 @@ func _update_player_info_ui():
 		
 		# 根据角色类型设置图标
 		var icon_texture
-		if player_node.is_in_group("Killer"):
+		if player_node.is_in_group("killer"):
 			icon_texture = killer_icon
 		else:
 			icon_texture = survivor_icon
@@ -184,17 +184,56 @@ func _remove_single_player():
 func _on_start_game_button_pressed():
 	if !game_started and multiplayer.is_server():
 		# 只有服务器可以启动游戏
+		print("服务器启动游戏!")
 		_start_game.rpc()
 
 @rpc("authority", "call_local")
 func _start_game():
-	print("游戏开始!")
+	print("收到游戏开始信号!")
 	game_started = true
-	start_game_button.visible = false
-	countdown_label.visible = true
-	countdown_timer.start()
 	
-	# 不再在这里生成玩家，由网络模块处理
+	# 隐藏开始按钮
+	if start_game_button:
+		start_game_button.visible = false
+	
+	# 显示并启动倒计时
+	if countdown_label:
+		countdown_label.visible = true
+		countdown_label.text = "5"
+	
+	if countdown_timer:
+		countdown_timer.start()
+	
+	# 确认每个玩家的角色设置
+	_sync_player_roles()
+
+func _sync_player_roles():
+	print("同步玩家角色信息")
+	var network = get_global().get_network()
+	if not network:
+		print("无法获取网络模块")
+		return
+	
+	var players_node = network._players_spawn_node
+	if not players_node:
+		print("无法获取玩家节点")
+		return
+	
+	for player_node in players_node.get_children():
+		var player_id = player_node.player_id
+		
+		# 确保玩家节点有正确的分组
+		if player_id == 1:  # 主机是杀手
+			if not player_node.is_in_group("killer"):
+				player_node.add_to_group("killer")
+				print("将玩家 " + str(player_id) + " 设置为杀手")
+		else:  # 其他玩家是幸存者
+			if not player_node.is_in_group("survivor"):
+				player_node.add_to_group("survivor")
+				print("将玩家 " + str(player_id) + " 设置为幸存者")
+	
+	# 更新UI以反映角色变化
+	_update_player_info_ui()
 
 func _on_countdown_timer_timeout():
 	# 倒计时结束，让Killer可以移动

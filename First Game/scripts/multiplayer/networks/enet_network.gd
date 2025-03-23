@@ -26,6 +26,10 @@ func join_as_client(lobby_id):
 	
 	multiplayer_peer.create_client(SERVER_IP, SERVER_PORT)
 	multiplayer.multiplayer_peer = multiplayer_peer
+	
+	# 客户端连接后主动请求同步UI
+	multiplayer.server_disconnected.connect(_on_server_disconnected)
+	multiplayer.connected_to_server.connect(_on_connected_to_server)
 
 func _add_player_to_game(id: int):
 	print("Player %s joined the game!" % id)
@@ -67,12 +71,32 @@ func _add_player_to_game(id: int):
 			if multiplayer.is_server():
 				_sync_all_clients_ui.rpc()
 
+func _on_connected_to_server():
+	print("已连接到服务器!")
+	# 客户端连接后请求同步玩家信息
+	_request_sync_from_server.rpc_id(1)
+
+func _on_server_disconnected():
+	print("与服务器断开连接!")
+
+@rpc("any_peer", "call_local")
+func _request_sync_from_server():
+	print("收到来自客户端 " + str(multiplayer.get_remote_sender_id()) + " 的同步请求")
+	if multiplayer.is_server():
+		print("服务器正在处理同步请求...")
+		# 服务器收到同步请求，通知所有客户端更新UI
+		_sync_all_clients_ui.rpc()
+
 @rpc("authority", "call_remote")
 func _sync_all_clients_ui():
 	# 强制所有客户端更新玩家信息UI
+	print("执行客户端UI同步...")
 	var game_manager = get_tree().get_current_scene().get_node_or_null("%GameManager")
 	if game_manager and get_tree().get_current_scene().name == "GameMPSurvivor":
 		game_manager._update_player_info_ui()
+		print("客户端UI更新完成")
+	else:
+		print("客户端无法找到游戏管理器或不在正确的场景中")
 
 func _del_player(id: int):
 	print("Player %s left the game!" % id)
