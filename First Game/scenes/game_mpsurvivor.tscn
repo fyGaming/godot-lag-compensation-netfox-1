@@ -62,7 +62,6 @@ one_shot = true
 unique_name_in_owner = true
 script = ExtResource("3_ck3ha")
 _players_spawn_node = NodePath("../Players")
-game_mode = 1
 
 [node name="MultiplayerHUD" type="Control" parent="."]
 unique_name_in_owner = true

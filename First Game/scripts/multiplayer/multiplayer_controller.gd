@@ -89,6 +89,7 @@ func _force_update_is_on_floor():
 	velocity = old_velocity
 
 func _process(delta):
+	#return
 	if not multiplayer.is_server() || MultiplayerManager.host_mode_enabled:
 		_apply_animations(delta)
 		
