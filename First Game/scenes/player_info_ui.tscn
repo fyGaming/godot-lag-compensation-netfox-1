@@ -62,5 +62,8 @@ custom_minimum_size = Vector2(0, 8)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_ocw3k")
 
+[node name="PlayerList" type="VBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+
 [node name="UpdateTimer" type="Timer" parent="."]
 autostart = true

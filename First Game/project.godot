@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="First Game"
-run/main_scene="res://scenes/MPSurvivor/MPSurvivor.tscn"
+run/main_scene="res://scenes/scene_selector.tscn"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
 

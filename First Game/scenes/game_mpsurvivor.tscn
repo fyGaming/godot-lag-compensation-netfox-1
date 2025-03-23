@@ -1,0 +1,202 @@
+[gd_scene load_steps=10 format=3 uid="uid://dxr3f3b28kchn"]
+
+[ext_resource type="Script" uid="uid://chqbxehwm0wwc" path="res://scripts/mpsurvivor/game_mpsurvivor_manager.gd" id="1_i8mgj"]
+[ext_resource type="FontFile" uid="uid://c53kogtyjwsss" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="2_tpkib"]
+[ext_resource type="Script" uid="uid://dkkhgcnj7g2a5" path="res://scripts/multiplayer/networks/network_manager.gd" id="3_ck3ha"]
+[ext_resource type="FontFile" uid="uid://dbjl1e6kdxpl6" path="res://assets/fonts/PixelOperator8.ttf" id="4_j5yvj"]
+[ext_resource type="PackedScene" uid="uid://cv6uww8k8yhc8" path="res://scenes/player_info_ui.tscn" id="5_vfmyg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_24lfj"]
+size = Vector2(1000, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2ikdb"]
+size = Vector2(1000, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qwl2f"]
+size = Vector2(20, 1000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_k61ui"]
+size = Vector2(20, 1000)
+
+[node name="GameMPSurvivor" type="Node2D"]
+
+[node name="GameManager" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("1_i8mgj")
+
+[node name="GameInfoLabel" type="Label" parent="GameManager"]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 200.0
+offset_bottom = 30.0
+theme_override_colors/font_color = Color(0.0980392, 0.313726, 0.752941, 1)
+theme_override_fonts/font = ExtResource("2_tpkib")
+theme_override_font_sizes/font_size = 12
+text = "多人吸血鬼生存模式"
+
+[node name="StartGameButton" type="Button" parent="GameManager"]
+visible = false
+offset_left = 450.0
+offset_top = 10.0
+offset_right = 550.0
+offset_bottom = 40.0
+theme_override_fonts/font = ExtResource("2_tpkib")
+text = "开始游戏"
+
+[node name="CountdownLabel" type="Label" parent="GameManager"]
+visible = false
+offset_left = 450.0
+offset_top = 50.0
+offset_right = 550.0
+offset_bottom = 80.0
+theme_override_fonts/font = ExtResource("2_tpkib")
+theme_override_font_sizes/font_size = 20
+text = "5"
+horizontal_alignment = 1
+
+[node name="CountdownTimer" type="Timer" parent="GameManager"]
+wait_time = 5.0
+one_shot = true
+
+[node name="NetworkManager" type="Node" parent="." node_paths=PackedStringArray("_players_spawn_node")]
+unique_name_in_owner = true
+script = ExtResource("3_ck3ha")
+_players_spawn_node = NodePath("../Players")
+
+[node name="MultiplayerHUD" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="MultiplayerHUD"]
+layout_mode = 0
+offset_left = 183.0
+offset_top = 86.0
+offset_right = 425.0
+offset_bottom = 229.0
+
+[node name="Label" type="Label" parent="MultiplayerHUD/Panel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 12.0
+offset_right = 214.0
+offset_bottom = 28.0
+theme_override_fonts/font = ExtResource("4_j5yvj")
+text = "Multiplayer mode"
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MultiplayerHUD/Panel"]
+layout_mode = 0
+offset_left = 38.0
+offset_top = 32.0
+offset_right = 201.0
+offset_bottom = 127.0
+
+[node name="HostButton" type="Button" parent="MultiplayerHUD/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_j5yvj")
+text = "Host New Game"
+
+[node name="JoinButton" type="Button" parent="MultiplayerHUD/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_j5yvj")
+text = "Join As Client"
+
+[node name="UseSteamButton" type="Button" parent="MultiplayerHUD/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_j5yvj")
+text = "Use Steam"
+
+[node name="SteamHUD" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="SteamHUD"]
+layout_mode = 0
+offset_left = 153.0
+offset_top = 44.0
+offset_right = 453.0
+offset_bottom = 259.0
+
+[node name="Label" type="Label" parent="SteamHUD/Panel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 12.0
+offset_right = 276.0
+offset_bottom = 38.0
+theme_override_fonts/font = ExtResource("4_j5yvj")
+text = "Steam Lobby"
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SteamHUD/Panel"]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 35.0
+offset_right = 280.0
+offset_bottom = 101.0
+
+[node name="HostButton" type="Button" parent="SteamHUD/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_j5yvj")
+text = "Host New Game"
+
+[node name="ListLobbiesButton" type="Button" parent="SteamHUD/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_j5yvj")
+text = "List Lobbies"
+
+[node name="Lobbies" type="ScrollContainer" parent="SteamHUD/Panel"]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 101.0
+offset_right = 282.0
+offset_bottom = 211.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SteamHUD/Panel/Lobbies"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ArenaWalls" type="StaticBody2D" parent="."]
+position = Vector2(500, 500)
+collision_layer = 4
+collision_mask = 0
+
+[node name="TopWall" type="CollisionShape2D" parent="ArenaWalls"]
+position = Vector2(0, -490)
+shape = SubResource("RectangleShape2D_24lfj")
+
+[node name="BottomWall" type="CollisionShape2D" parent="ArenaWalls"]
+position = Vector2(0, 490)
+shape = SubResource("RectangleShape2D_2ikdb")
+
+[node name="LeftWall" type="CollisionShape2D" parent="ArenaWalls"]
+position = Vector2(-490, 0)
+shape = SubResource("RectangleShape2D_qwl2f")
+
+[node name="RightWall" type="CollisionShape2D" parent="ArenaWalls"]
+position = Vector2(490, 0)
+shape = SubResource("RectangleShape2D_k61ui")
+
+[node name="Players" type="Node2D" parent="."]
+position = Vector2(500, 500)
+
+[node name="PlayerInfoUI" parent="." instance=ExtResource("5_vfmyg")]
+visible = false
+
+[connection signal="pressed" from="GameManager/StartGameButton" to="GameManager" method="_on_start_game_button_pressed"]
+[connection signal="timeout" from="GameManager/CountdownTimer" to="GameManager" method="_on_countdown_timer_timeout"]
+[connection signal="pressed" from="MultiplayerHUD/Panel/VBoxContainer/HostButton" to="GameManager" method="become_host"]
+[connection signal="pressed" from="MultiplayerHUD/Panel/VBoxContainer/JoinButton" to="GameManager" method="join_as_client"]
+[connection signal="pressed" from="MultiplayerHUD/Panel/VBoxContainer/UseSteamButton" to="GameManager" method="use_steam"]
+[connection signal="pressed" from="SteamHUD/Panel/VBoxContainer/HostButton" to="GameManager" method="become_host"]
+[connection signal="pressed" from="SteamHUD/Panel/VBoxContainer/ListLobbiesButton" to="GameManager" method="list_steam_lobbies"]
