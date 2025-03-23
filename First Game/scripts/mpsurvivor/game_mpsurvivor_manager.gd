@@ -51,19 +51,29 @@ func _update_player_info_ui():
 	for child in player_list.get_children():
 		child.queue_free()
 	
-	var player_ids = players_info.keys()
-	player_ids.append(multiplayer.get_unique_id())
+	# 从玩家节点收集信息
+	var player_ids = []
+	var players_node = $"../Players"
+	
+	# 获取所有已连接的玩家ID
+	for player in players_node.get_children():
+		player_ids.append(player.player_id)
+	
 	player_ids.sort()
 	
 	for id in player_ids:
 		var label = Label.new()
 		var role_text = ""
+		var player_node = players_node.get_node_or_null(str(id))
+		
 		if id == multiplayer.get_unique_id():
 			role_text = "（你）"
-		if multiplayer.is_server() and id == multiplayer.get_unique_id():
-			role_text += " [Killer]"
-		elif multiplayer.is_server() or id == multiplayer.get_unique_id():
-			role_text += " [Survivor]"
+		
+		if player_node:
+			if player_node.is_in_group("killer"):
+				role_text += " [Killer]"
+			elif player_node.is_in_group("survivor"):
+				role_text += " [Survivor]"
 		
 		label.text = "玩家 %d %s" % [id, role_text]
 		player_list.add_child(label)
@@ -155,32 +165,7 @@ func _start_game():
 	countdown_label.visible = true
 	countdown_timer.start()
 	
-	# 生成所有玩家
-	_spawn_players()
-
-func _spawn_players():
-	# 确保玩家生成节点是空的
-	for child in $"../Players".get_children():
-		child.queue_free()
-	
-	# 生成Killer（主机）
-	if multiplayer.is_server():
-		var killer_instance = killer_scene.instantiate()
-		killer_instance.name = str(multiplayer.get_unique_id())
-		killer_instance.player_id = multiplayer.get_unique_id()
-		$"../Players".add_child(killer_instance, true)
-		
-		# 禁用Killer的移动 (将在倒计时结束后启用)
-		killer_instance.can_move = false
-	
-	# 生成Survivors（客户端）
-	for peer_id in players_info.keys():
-		if peer_id != multiplayer.get_unique_id(): # 不是主机
-			var survivor_instance = survivor_scene.instantiate()
-			survivor_instance.name = str(peer_id)
-			survivor_instance.player_id = peer_id
-			survivor_instance.health = 50
-			$"../Players".add_child(survivor_instance, true)
+	# 不再在这里生成玩家，由网络模块处理
 
 func _on_countdown_timer_timeout():
 	# 倒计时结束，让Killer可以移动
@@ -189,20 +174,22 @@ func _on_countdown_timer_timeout():
 
 @rpc("authority", "call_local")
 func _enable_killer_movement():
-	var killer_node = $"../Players".get_node_or_null(str(multiplayer.get_unique_id()))
-	if killer_node and killer_node.is_in_group("killer"):
-		killer_node.can_move = true
+	# 找到所有Killer并启用移动
+	for player in $"../Players".get_children():
+		if player.is_in_group("killer"):
+			player.can_move = true
 
 # 幸存者受伤的处理
 @rpc("authority", "call_local")
 func survivor_damaged(survivor_id, damage):
 	if multiplayer.is_server():
-		if players_info.has(survivor_id):
-			players_info[survivor_id].health -= damage
-			if players_info[survivor_id].health <= 0:
+		var survivor_node = $"../Players".get_node_or_null(str(survivor_id))
+		if survivor_node and survivor_node.is_in_group("survivor"):
+			survivor_node.health -= damage
+			if survivor_node.health <= 0:
 				_survivor_died.rpc(survivor_id)
 			else:
-				_update_survivor_health.rpc(survivor_id, players_info[survivor_id].health)
+				_update_survivor_health.rpc(survivor_id, survivor_node.health)
 
 @rpc("authority", "call_local")
 func _update_survivor_health(survivor_id, new_health):
@@ -213,13 +200,13 @@ func _update_survivor_health(survivor_id, new_health):
 @rpc("authority", "call_local")
 func _survivor_died(survivor_id):
 	print("幸存者 %d 死亡!" % survivor_id)
-	# 可以在这里添加幸存者死亡的相关逻辑 
+	# 可以在这里添加幸存者死亡的相关逻辑
 
 # 根据房间内玩家数量更新开始游戏按钮
 func _update_start_game_button():
 	if multiplayer.is_server() and !game_started:
-		# 算上主机自己，玩家总数>=2时可以开始游戏
-		var total_players = players_info.size() + 1
-		start_game_button.visible = (total_players >= 2)
+		# 检查玩家数量 >=2 时可以开始游戏
+		var player_count = $"../Players".get_child_count()
+		start_game_button.visible = (player_count >= 2)
 	else:
 		start_game_button.visible = false

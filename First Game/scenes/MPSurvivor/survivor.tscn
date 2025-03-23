@@ -30,11 +30,12 @@ corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
-[node name="Survivor" type="CharacterBody2D" groups=["survivor"]]
+[node name="Survivor" type="CharacterBody2D" node_paths=PackedStringArray("input") groups=["survivor"]]
 collision_layer = 2
 collision_mask = 4
 motion_mode = 1
 script = ExtResource("1_kpnuu")
+input = NodePath("Input")
 
 [node name="PlayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_c13yi")

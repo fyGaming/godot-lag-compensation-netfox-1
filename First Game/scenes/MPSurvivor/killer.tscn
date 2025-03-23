@@ -20,11 +20,12 @@ corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
-[node name="Killer" type="CharacterBody2D" groups=["killer"]]
+[node name="Killer" type="CharacterBody2D" node_paths=PackedStringArray("input") groups=["killer"]]
 collision_layer = 2
 collision_mask = 4
 motion_mode = 1
 script = ExtResource("1_dnjws")
+input = NodePath("Input")
 
 [node name="PlayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_8vfps")
