@@ -1,15 +1,16 @@
-[gd_scene load_steps=9 format=3 uid="uid://8bcgwwnxvujr"]
+[gd_scene load_steps=10 format=3 uid="uid://8bcgwwnxvujr"]
 
-[ext_resource type="Script" path="res://scripts/mpsurvivor/survivor.gd" id="1_kpnuu"]
-[ext_resource type="Script" path="res://scripts/multiplayer/multiplayer_input.gd" id="2_7iog2"]
-[ext_resource type="Script" uid="uid://bw2uhfqy1ni2h" path="res://addons/netfox/rollback/rollback-synchronizer.gd" id="3_htpvo"]
-[ext_resource type="Script" uid="uid://78qqn15e6kpw" path="res://addons/netfox/tick-interpolator.gd" id="4_g24t3"]
+[ext_resource type="Script" uid="uid://ddlnvvt2y76m8" path="res://scripts/mpsurvivor/survivor.gd" id="1_kpnuu"]
+[ext_resource type="Script" uid="uid://x6cbjih2l86y" path="res://scripts/multiplayer/multiplayer_input.gd" id="2_7iog2"]
+[ext_resource type="Script" path="res://scripts/mpsurvivor/survivor_controller.gd" id="3_3y1qv"]
+[ext_resource type="Script" uid="uid://bw2uhfqy1ni2h" path="res://addons/netfox/rollback/rollback-synchronizer.gd" id="4_q0yjj"]
+[ext_resource type="Script" uid="uid://78qqn15e6kpw" path="res://addons/netfox/tick-interpolator.gd" id="5_fwblx"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_c13yi"]
 properties/0/path = NodePath(".:player_id")
 properties/0/spawn = true
 properties/0/replication_mode = 0
-properties/1/path = NodePath(".:health")
+properties/1/path = NodePath("Controller:health")
 properties/1/spawn = true
 properties/1/replication_mode = 1
 
@@ -42,14 +43,19 @@ replication_config = SubResource("SceneReplicationConfig_c13yi")
 [node name="Input" type="Node" parent="."]
 script = ExtResource("2_7iog2")
 
+[node name="Controller" type="Node" parent="." node_paths=PackedStringArray("character_body", "input")]
+script = ExtResource("3_3y1qv")
+character_body = NodePath("..")
+input = NodePath("../Input")
+
 [node name="RollbackSynchronizer" type="Node" parent="." node_paths=PackedStringArray("root")]
-script = ExtResource("3_htpvo")
+script = ExtResource("4_q0yjj")
 root = NodePath("..")
 state_properties = Array[String]([":global_transform", ":velocity"])
 input_properties = Array[String](["Input:input_direction"])
 
 [node name="TickInterpolator" type="Node" parent="." node_paths=PackedStringArray("root")]
-script = ExtResource("4_g24t3")
+script = ExtResource("5_fwblx")
 root = NodePath("..")
 properties = Array[String]([":global_transform"])
 
@@ -88,4 +94,4 @@ offset_right = 30.0
 offset_bottom = -25.0
 theme_override_styles/fill = SubResource("StyleBoxFlat_44n2m")
 value = 100.0
-show_percentage = false 
+show_percentage = false

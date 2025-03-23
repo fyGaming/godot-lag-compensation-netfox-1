@@ -1,14 +1,18 @@
-[gd_scene load_steps=8 format=3 uid="uid://dgc0shcy4iiyn"]
+[gd_scene load_steps=9 format=3 uid="uid://dgc0shcy4iiyn"]
 
 [ext_resource type="Script" path="res://scripts/mpsurvivor/killer.gd" id="1_dnjws"]
 [ext_resource type="Script" path="res://scripts/multiplayer/multiplayer_input.gd" id="2_1cwk3"]
-[ext_resource type="Script" uid="uid://bw2uhfqy1ni2h" path="res://addons/netfox/rollback/rollback-synchronizer.gd" id="3_rl3qf"]
-[ext_resource type="Script" uid="uid://78qqn15e6kpw" path="res://addons/netfox/tick-interpolator.gd" id="4_2vr40"]
+[ext_resource type="Script" path="res://scripts/mpsurvivor/killer_controller.gd" id="3_4j2md"]
+[ext_resource type="Script" uid="uid://bw2uhfqy1ni2h" path="res://addons/netfox/rollback/rollback-synchronizer.gd" id="4_rwsjv"]
+[ext_resource type="Script" uid="uid://78qqn15e6kpw" path="res://addons/netfox/tick-interpolator.gd" id="5_uaxxm"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_8vfps"]
 properties/0/path = NodePath(".:player_id")
 properties/0/spawn = true
 properties/0/replication_mode = 0
+properties/1/path = NodePath("Controller:can_move")
+properties/1/spawn = true
+properties/1/replication_mode = 1
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cwmrj"]
 size = Vector2(30, 30)
@@ -32,14 +36,19 @@ replication_config = SubResource("SceneReplicationConfig_8vfps")
 [node name="Input" type="Node" parent="."]
 script = ExtResource("2_1cwk3")
 
+[node name="Controller" type="Node" parent="." node_paths=PackedStringArray("character_body", "input")]
+script = ExtResource("3_4j2md")
+character_body = NodePath("..")
+input = NodePath("../Input")
+
 [node name="RollbackSynchronizer" type="Node" parent="." node_paths=PackedStringArray("root")]
-script = ExtResource("3_rl3qf")
+script = ExtResource("4_rwsjv")
 root = NodePath("..")
 state_properties = Array[String]([":global_transform", ":velocity"])
 input_properties = Array[String](["Input:input_direction"])
 
 [node name="TickInterpolator" type="Node" parent="." node_paths=PackedStringArray("root")]
-script = ExtResource("4_2vr40")
+script = ExtResource("5_uaxxm")
 root = NodePath("..")
 properties = Array[String]([":global_transform"])
 

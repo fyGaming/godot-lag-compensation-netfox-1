@@ -1,21 +1,16 @@
 extends CharacterBody2D
 
-const SPEED = 250.0
-
-@onready var rollback_synchronizer = $RollbackSynchronizer
-@onready var health_bar = $HealthBar
-
-@export var input: PlayerInput
-@export var health: int = 50:
-	set(value):
-		health = value
-		if health_bar:
-			health_bar.value = (float(health) / 50.0) * 100.0
-
 @export var player_id := 1:
 	set(id):
 		player_id = id
-		input.set_multiplayer_authority(id)
+		if input:
+			input.set_multiplayer_authority(id)
+
+var username = ""
+
+@onready var input = $Input
+@onready var username_label = $Username
+@onready var controller = $Controller
 
 func _ready():
 	if multiplayer.get_unique_id() == player_id:
@@ -23,31 +18,21 @@ func _ready():
 	else:
 		$Camera2D.enabled = false
 	
-	# 设置用户名标签
-	$Username.text = "Survivor (%d)" % player_id
-	
-	# 初始化健康条
-	health_bar.value = (float(health) / 50.0) * 100.0
-	
-	rollback_synchronizer.process_settings()
+	# 设置默认用户名标签
+	username_label.text = "Survivor"
 
-func _rollback_tick(delta, tick, is_fresh):
-	_apply_movement_from_input(delta)
-
-func _apply_movement_from_input(delta):
-	# 获取输入方向
-	var direction = Vector2.ZERO
+# 网络事件函数
+func _network_spawn(data):
+	player_id = data.player_id
+	if player_id == MultiplayerManager.network_unique_id:
+		username = MultiplayerManager.username
+	else:
+		username = MultiplayerManager.get_username_by_id(player_id)
 	
-	# 从输入系统获取方向（现在是Vector2）
-	direction = input.input_direction
-	
-	# 应用移动
-	velocity = direction * SPEED * NetworkTime.physics_factor
-	move_and_slide()
-	velocity /= NetworkTime.physics_factor
+	username_label.text = username
 
-# 显示受伤动画
-func show_damage():
+# 受到伤害时触发闪烁效果（由controller调用）
+func flash():
 	var tween = create_tween()
-	tween.tween_property($Circle, "modulate", Color(1, 0, 0, 0.5), 0.1)
+	tween.tween_property($Circle, "modulate", Color(1, 0, 0, 1), 0.1)
 	tween.tween_property($Circle, "modulate", Color(1, 1, 1, 1), 0.1) 

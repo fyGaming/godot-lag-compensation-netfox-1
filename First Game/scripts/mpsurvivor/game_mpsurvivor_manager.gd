@@ -171,7 +171,7 @@ func _spawn_players():
 		$"../Players".add_child(killer_instance, true)
 		
 		# 禁用Killer的移动 (将在倒计时结束后启用)
-		killer_instance.can_move = false
+		killer_instance.get_node("Controller").can_move = false
 	
 	# 生成Survivors（客户端）
 	for peer_id in players_info.keys():
@@ -179,7 +179,6 @@ func _spawn_players():
 			var survivor_instance = survivor_scene.instantiate()
 			survivor_instance.name = str(peer_id)
 			survivor_instance.player_id = peer_id
-			survivor_instance.health = 50
 			$"../Players".add_child(survivor_instance, true)
 
 func _on_countdown_timer_timeout():
@@ -191,7 +190,7 @@ func _on_countdown_timer_timeout():
 func _enable_killer_movement():
 	var killer_node = $"../Players".get_node_or_null(str(multiplayer.get_unique_id()))
 	if killer_node and killer_node.is_in_group("killer"):
-		killer_node.can_move = true
+		killer_node.get_node("Controller").can_move = true
 
 # 幸存者受伤的处理
 @rpc("authority", "call_local")
@@ -208,7 +207,7 @@ func survivor_damaged(survivor_id, damage):
 func _update_survivor_health(survivor_id, new_health):
 	var survivor_node = $"../Players".get_node_or_null(str(survivor_id))
 	if survivor_node and survivor_node.is_in_group("survivor"):
-		survivor_node.health = new_health
+		survivor_node.get_node("Controller").health = new_health
 
 @rpc("authority", "call_local")
 func _survivor_died(survivor_id):
@@ -221,5 +220,3 @@ func _update_start_game_button():
 		# 算上主机自己，玩家总数>=2时可以开始游戏
 		var total_players = players_info.size() + 1
 		start_game_button.visible = (total_players >= 2)
-	else:
-		start_game_button.visible = false
